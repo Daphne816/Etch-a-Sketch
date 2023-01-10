@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <title>Etch-a-Sketch</title>
+    <style>
+      * {box-sizing: border-box;
+         margin: 0;}
+      body {margin: 1rem 1rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;}
+      button {margin-block: 1rem;}
+      div#container {border: medium solid black;
+                     width: 800px;}
+      div.grid {border: thin solid gray;}
+    </style>
+  </head>
+  <body>
+  <h1>Etch-a-Sketch</h1>
+  <button>Create New Grid</button>
+  <div id="container">
+  </div>
+  </body>
+  <script>
+    const button = document.querySelector("button");
+    const container = document.getElementById("container");
+
+    button.addEventListener("click", () => {
+      const squares = getNewGrid();
+      if(squares){
+        deleteOldGrid();
+        createGrid(squares);
+      }
+    });
+
+    
+    function createGrid(squares = 16){
+      for(i = 0; i < squares; i++){
+      const row = document.createElement("div");
+      row.setAttribute("class", "row");
+      row.style.display = "flex";
+      container.appendChild(row);
+        for(x = 0; x < squares; x++){
+          const div = document.createElement("div");
+          div.setAttribute("class", "grid");
+          div.setAttribute(`style`, `width: ${800 / squares}px; height: ${800 / squares}px;`);
+          div.addEventListener("mouseover", (event) => {
+            const caller = event.target;
+            if(caller.classList.contains("shaded")){
+              caller.style.backgroundColor = darkenRGB(caller.style.backgroundColor);
+            }
+            else{
+              caller.style.backgroundColor = getRandomRGB();
+              caller.classList.add("shaded");
+            }
+          })
+          row.appendChild(div);
+        }
+      }
+    }
+
+    function getRandomRGB(){
+      const min = Math.ceil(0);
+      const max = Math.floor(255);
+      let numArr = new Array();
+      let rgb = "";
+      for(i = 0; i < 3; i++){
+        const num = Math.floor(Math.random() * (max - min + 1)) + min;
+        numArr.push(num);
+      }
+      return `rgb(${numArr[0]},${numArr[1]},${numArr[2]})`;
+    }
+
+    //Darkens rgb by 10%
+    function darkenRGB(rgb){
+      const rgbParts = rgb.split(",");
+      let r = Math.floor(parseInt(rgbParts[0].substring(4)));
+      let g = Math.floor(parseInt(rgbParts[1].substring(1)));
+      let b = Math.floor(parseInt(rgbParts[2].replace(")","").trim()));
+      r = Math.floor(r-25.5); 
+      g = Math.floor(g-25.5); 
+      b = Math.floor(b-25.5); 
+      if(r < 0){r = 0;}
+      if(g < 0){g = 0;}
+      if(b < 0){b = 0;}
+      console.log(rgbParts);
+      console.log(r);
+      console.log(g);
+      console.log(b);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function getNewGrid(){
+      let squares = 0;
+      squares = prompt("How many squares per side?");
+      if(squares){
+        squares = parseInt(squares);
+      }
+      else{
+        return;
+      }
+      //squares input must be a positive, non-zero int less than 101
+      while(squares < 2 || squares > 100 || !Number.isInteger(squares)){
+        if(squares){
+          squares = parseInt(prompt("How many squares per side?\nMust be a postive integer (2 - 100)"));
+        }
+        else{
+          return;
+        }
+      }
+      return squares;
+    }
+
+    function deleteOldGrid(){
+      const oldRows = document.querySelectorAll(".row");
+      oldRows.forEach((row) => {
+        container.removeChild(row);
+      })
+    }
+
+    createGrid();
+
+  </script>
+</html>
